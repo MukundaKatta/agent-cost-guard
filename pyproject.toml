@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agent-cost-guard"
+version = "0.1.0"
+description = "Track cumulative LLM cost and enforce USD limits with warnings and callbacks."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["llm", "agents", "cost", "budget", "anthropic", "openai"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+agent_cost_guard = ["py.typed"]

@@ -1,0 +1,113 @@
+Metadata-Version: 2.4
+Name: agent-cost-guard
+Version: 0.1.0
+Summary: Track cumulative LLM cost and enforce USD limits with warnings and callbacks.
+License: MIT
+Keywords: llm,agents,cost,budget,anthropic,openai
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# agent-cost-guard
+
+Track cumulative LLM cost and enforce USD limits — with warnings and callbacks.
+
+Zero dependencies. Python 3.10+. MIT.
+
+## Install
+
+```bash
+pip install agent-cost-guard
+```
+
+## Usage
+
+```python
+from agent_cost_guard import CostGuard
+
+guard = CostGuard(limit_usd=1.00)
+
+# Record each API call cost
+guard.add(0.05, label="research_turn_1")
+guard.add(0.12, label="web_search")
+guard.add(0.08, label="synthesis")
+
+print(guard.total_usd)    # 0.25
+print(guard.remaining_usd)  # 0.75
+print(guard.ok)           # True
+```
+
+## Raise on limit
+
+```python
+guard = CostGuard(limit_usd=0.10)
+guard.add(0.05)
+guard.add(0.06)  # raises CostLimitExceeded: $0.11 > $0.10
+```
+
+## Warn before the limit
+
+```python
+def on_warn(w):
+    print(f"Cost at {w.pct_used:.0%} — ${w.total_usd:.4f} used")
+
+guard = CostGuard(
+    limit_usd=1.00,
+    warn_at=[0.5, 0.8],
+    on_warn=on_warn,
+)
+```
+
+## Summary
+
+```python
+s = guard.summary()
+print(s.total_usd)     # cumulative cost
+print(s.by_label)      # {"web_search": 0.12, ...}
+print(str(s))          # formatted report
+```
+
+## Factory
+
+```python
+from agent_cost_guard import make_cost_guard
+
+guard = make_cost_guard(limit_usd=1.00, on_warn=on_warn)
+# warn_at defaults to [0.5, 0.8]
+```
+
+## API
+
+### `CostGuard(limit_usd, *, warn_at, on_warn, stop_on_limit, label)`
+
+- `warn_at`: float or list of floats (fractions of `limit_usd`)
+- `stop_on_limit`: if False, tracking continues past the limit without raising
+- `on_warn`: `Callable[[CostWarning], None]`
+
+### `guard.add(cost_usd, *, label="")`
+
+Record a cost. Raises `CostLimitExceeded` if over limit and `stop_on_limit=True`.
+
+### `guard.check()`
+
+Manually check the limit; raises if over.
+
+### `guard.reset()`
+
+Reset all cost tracking and warning state.
+
+### `guard.summary() -> CostSummary`
+
+Aggregate report with `total_usd`, `by_label`, `ok`, `remaining_usd`.
+
+## License
+
+MIT
