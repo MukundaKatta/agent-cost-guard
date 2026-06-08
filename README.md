@@ -1,8 +1,15 @@
 # agent-cost-guard
 
+[![CI](https://github.com/MukundaKatta/agent-cost-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/MukundaKatta/agent-cost-guard/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Track cumulative LLM cost and enforce USD limits — with warnings and callbacks.
 
 Zero dependencies. Python 3.10+. MIT.
+
+Useful for capping how much an autonomous agent or batch job can spend: record
+the cost of every model/tool call, get a callback as you approach the budget,
+and raise a clean exception the moment you cross the limit.
 
 ## Install
 
@@ -90,6 +97,21 @@ Reset all cost tracking and warning state.
 
 Aggregate report with `total_usd`, `by_label`, `ok`, `remaining_usd`.
 
+## Development
+
+The library has zero runtime dependencies, and the test suite uses only the
+Python standard library (`unittest`) — nothing to install:
+
+```bash
+git clone https://github.com/MukundaKatta/agent-cost-guard
+cd agent-cost-guard
+python3 -m unittest discover -s tests -v
+```
+
+CI runs the same suite against Python 3.10–3.13 on every push and pull request
+(see `.github/workflows/ci.yml`).
+
 ## License
 
 MIT
+
